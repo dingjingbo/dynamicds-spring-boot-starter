@@ -6,6 +6,7 @@ import com.deidara.dynamicds.actable.annotation.Table;
 import com.deidara.dynamicds.actable.TableClassUtil;
 import com.deidara.dynamicds.actable.mysql.MySqlTableDesc;
 import com.deidara.dynamicds.aop.DataSourceContextHolder;
+import com.deidara.dynamicds.aop.DynamicDataSourceAspect;
 import com.deidara.dynamicds.datasource.DynamicDataSource;
 import com.deidara.dynamicds.util.CollectionUtil;
 import com.deidara.dynamicds.datasource.CustomDataHolder;
@@ -21,6 +22,7 @@ import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.boot.web.servlet.ServletRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
@@ -30,6 +32,7 @@ import java.util.*;
 @Slf4j
 @Configuration
 @AutoConfigureBefore(DataSourceAutoConfiguration.class)
+@Import(DynamicDataSourceAspect.class)
 @EnableConfigurationProperties({DynamicDataSourceProperties.class, DruidDataSourceProperties.class})
 public class DynamicDataSourceAutoConfiguration {
 

@@ -8,6 +8,7 @@ import org.apache.hadoop.security.UserGroupInformation;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.security.PrivilegedExceptionAction;
 import java.sql.SQLException;
 
@@ -38,7 +39,21 @@ public class DruidDataSourceWrapper  extends DruidDataSource {
     }
 
     public void setKeytabFile(String keytabFile) {
-        this.keytabFile = keytabFile;
+        try {
+            if(keytabFile.startsWith("classpath:")){
+                String path = keytabFile.split("classpath:")[1].trim();
+                String fileName = path.substring(path.lastIndexOf("/") + 1);
+                File file = new File("/etc/keytab/");
+                if(!file.exists()){
+                    file.mkdirs();
+                }
+                keytabFile = "/etc/keytab/" + fileName;
+                IOUtils.copy(DruidDataSourceWrapper.class.getClassLoader().getResourceAsStream(path), new FileOutputStream(keytabFile));
+            }
+            this.keytabFile = keytabFile;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public DruidPooledConnection superGetConnection(long maxWaitMillis) throws SQLException {
@@ -52,16 +67,6 @@ public class DruidDataSourceWrapper  extends DruidDataSource {
                 Configuration conf = new Configuration();
                 conf.set("hadoop.security.authentication", "Kerberos");
                 UserGroupInformation.setConfiguration(conf);
-                if(keytabFile.startsWith("classpath:")){
-                    String path = keytabFile.split("classpath:")[1].trim();
-                    String fileName = path.substring(path.lastIndexOf("/") + 1);
-                    File file = new File("/etc/keytab/");
-                    if(!file.exists()){
-                        file.mkdirs();
-                    }
-                    keytabFile = "/etc/keytab/" + fileName;
-                    IOUtils.copy(DruidDataSourceWrapper.class.getClassLoader().getResourceAsStream(path), new FileOutputStream(keytabFile));
-                }
                 UserGroupInformation ugi = UserGroupInformation.loginUserFromKeytabAndReturnUGI(authUser, keytabFile);
                 DruidDataSourceWrapper _this = this;
                 DruidPooledConnection conn = ugi.doAs(new PrivilegedExceptionAction<DruidPooledConnection>() {
