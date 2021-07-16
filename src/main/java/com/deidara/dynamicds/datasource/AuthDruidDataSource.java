@@ -2,17 +2,18 @@ package com.deidara.dynamicds.datasource;
 
 import com.alibaba.druid.pool.DruidDataSource;
 import com.alibaba.druid.pool.DruidPooledConnection;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.security.UserGroupInformation;
 
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.security.PrivilegedExceptionAction;
 import java.sql.SQLException;
 
-public class DruidDataSourceWrapper  extends DruidDataSource {
+@Slf4j
+public class AuthDruidDataSource extends DruidDataSource {
 
     private String authType;
     private String authUser;
@@ -48,7 +49,7 @@ public class DruidDataSourceWrapper  extends DruidDataSource {
                     file.mkdirs();
                 }
                 keytabFile = "/etc/keytab/" + fileName;
-                IOUtils.copy(DruidDataSourceWrapper.class.getClassLoader().getResourceAsStream(path), new FileOutputStream(keytabFile));
+                IOUtils.copy(AuthDruidDataSource.class.getClassLoader().getResourceAsStream(path), new FileOutputStream(keytabFile));
             }
             this.keytabFile = keytabFile;
         } catch (Exception e) {
@@ -63,12 +64,13 @@ public class DruidDataSourceWrapper  extends DruidDataSource {
     @Override
     public DruidPooledConnection getConnection(long maxWaitMillis) throws SQLException {
         try {
+            log.info("keytabFile------------------------------:"+keytabFile);
             if ("kerberos".equalsIgnoreCase(authType)){
                 Configuration conf = new Configuration();
                 conf.set("hadoop.security.authentication", "Kerberos");
                 UserGroupInformation.setConfiguration(conf);
                 UserGroupInformation ugi = UserGroupInformation.loginUserFromKeytabAndReturnUGI(authUser, keytabFile);
-                DruidDataSourceWrapper _this = this;
+                AuthDruidDataSource _this = this;
                 DruidPooledConnection conn = ugi.doAs(new PrivilegedExceptionAction<DruidPooledConnection>() {
                     public DruidPooledConnection run() {
                         DruidPooledConnection tcon = null;
