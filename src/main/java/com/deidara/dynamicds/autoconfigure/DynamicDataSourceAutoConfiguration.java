@@ -54,7 +54,7 @@ public class DynamicDataSourceAutoConfiguration {
                 BeanUtils.copyProperties(dataSourceProperties, ds);
                 dsMap.put(dataSourceName, ds);
             } catch (Exception e) {
-                throw new RuntimeException("数据源配置错误：" + dataSourceName);
+                throw new RuntimeException("数据源配置错误：" + dataSourceName, e);
             }
         }
         Object defaultDataSource = dsMap.get(dynamicDataSourceProperties.getPrimary());

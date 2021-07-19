@@ -44,11 +44,12 @@ public class AuthDruidDataSource extends DruidDataSource {
             if(keytabFile.startsWith("classpath:")){
                 String path = keytabFile.split("classpath:")[1].trim();
                 String fileName = path.substring(path.lastIndexOf("/") + 1);
-                File file = new File("/etc/keytab/");
+                String keytabPath = System.getProperty("user.home") + "/keytab/";
+                File file = new File(keytabPath);
                 if(!file.exists()){
                     file.mkdirs();
                 }
-                keytabFile = "/etc/keytab/" + fileName;
+                keytabFile = keytabPath + fileName;
                 IOUtils.copy(AuthDruidDataSource.class.getClassLoader().getResourceAsStream(path), new FileOutputStream(keytabFile));
             }
             this.keytabFile = keytabFile;
