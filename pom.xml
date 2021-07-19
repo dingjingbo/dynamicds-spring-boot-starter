@@ -13,9 +13,8 @@
 
     <groupId>com.deidara.dynamicds</groupId>
     <artifactId>dynamicds-spring-boot-starter</artifactId>
-    <version>1.0</version>
+    <version>1.0.1</version>
     <packaging>jar</packaging>
-    <name>dynamicds-spring-boot-starter</name>
 
     <dependencies>
 
