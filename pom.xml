@@ -17,7 +17,6 @@
     <packaging>jar</packaging>
 
     <dependencies>
-
         <dependency>
             <groupId>org.apache.hadoop</groupId>
             <artifactId>hadoop-common</artifactId>
@@ -59,7 +58,6 @@
             <version>1.18.4</version>
             <scope>provided</scope>
         </dependency>
-
     </dependencies>
 
 </project>
