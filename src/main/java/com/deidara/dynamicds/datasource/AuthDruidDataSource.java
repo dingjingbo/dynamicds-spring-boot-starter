@@ -2,7 +2,7 @@ package com.deidara.dynamicds.datasource;
 
 import com.alibaba.druid.pool.DruidDataSource;
 import com.alibaba.druid.pool.DruidPooledConnection;
-import com.deidara.hutool.AppUtil;
+import com.deidara.hutoolplus.AppUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.security.UserGroupInformation;
