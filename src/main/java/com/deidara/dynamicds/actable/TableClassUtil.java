@@ -1,10 +1,12 @@
 package com.deidara.dynamicds.actable;
 
+import cn.hutool.core.util.ClassUtil;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.deidara.dynamicds.actable.annotation.Table;
-import com.deidara.dynamicds.util.ClassUtil;
 import lombok.extern.slf4j.Slf4j;
 
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -28,10 +30,8 @@ public class TableClassUtil {
      * @return
      */
     public static List<Class<?>> loadTableClasses(String ... basePackages){
-        List<Class<?>> classes = ClassUtil.getClasses(basePackages);
-        List<Class<?>> collect = classes.stream().filter(x -> x.isAnnotationPresent(Table.class) || (isImportMybatisPlus && x.isAnnotationPresent(TableName.class)))
-                .collect(Collectors.toList());
-        return  collect;
+        return Arrays.stream(basePackages).map(basePackage -> ClassUtil.scanPackage(basePackage, x -> x.isAnnotationPresent(Table.class) || (isImportMybatisPlus && x.isAnnotationPresent(TableName.class))))
+                .flatMap(Collection::stream).distinct().collect(Collectors.toList());
     }
 
 }

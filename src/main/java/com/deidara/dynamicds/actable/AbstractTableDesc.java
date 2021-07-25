@@ -1,12 +1,12 @@
 package com.deidara.dynamicds.actable;
 
+import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.deidara.dynamicds.actable.annotation.Column;
 import com.deidara.dynamicds.actable.annotation.Table;
 import com.deidara.dynamicds.actable.annotation.Transient;
-import com.deidara.dynamicds.util.StringUtil;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 
@@ -48,7 +48,7 @@ public abstract class AbstractTableDesc {
         if(clazz.isAnnotationPresent(Table.class)){
             Table tableAnno = clazz.getAnnotation(Table.class);
             if ("".equals(tableAnno.value().trim())){
-                this.setName(StringUtil.underscoreName(clazz.getSimpleName()));
+                this.setName(StrUtil.toUnderlineCase(clazz.getSimpleName()));
             }else {
                 this.setName(tableAnno.value().trim());
             }
@@ -58,7 +58,7 @@ public abstract class AbstractTableDesc {
         if(isImportMybatisPlus && clazz.isAnnotationPresent(TableName.class)){
             TableName tableAnno = clazz.getAnnotation(TableName.class);
             if ("".equals(tableAnno.value().trim())){
-                this.setName(StringUtil.underscoreName(clazz.getSimpleName()));
+                this.setName(StrUtil.toUnderlineCase(clazz.getSimpleName()));
             }else {
                 this.setName(tableAnno.value().trim());
             }
@@ -75,7 +75,7 @@ public abstract class AbstractTableDesc {
             if(isImportMybatisPlus && field.isAnnotationPresent(TableField.class) && !field.getAnnotation(TableField.class).exist()) continue;
             AbstractColumnDesc tableColumn = getColumnDesc();
             tableColumn.setTableName(this.getName());
-            tableColumn.setColumnName(StringUtil.underscoreName(field.getName()));
+            tableColumn.setColumnName(StrUtil.toUnderlineCase(field.getName()));
             tableColumn.setColumnType(convert2SqlType(field.getType()));
             if(field.isAnnotationPresent(Column.class)){
                 Column columnAnno = field.getAnnotation(Column.class);

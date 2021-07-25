@@ -8,7 +8,6 @@ import com.deidara.dynamicds.actable.mysql.MySqlTableDesc;
 import com.deidara.dynamicds.aop.DataSourceContextHolder;
 import com.deidara.dynamicds.aop.DynamicDataSourceAspect;
 import com.deidara.dynamicds.datasource.DynamicDataSource;
-import com.deidara.dynamicds.util.CollectionUtil;
 import com.deidara.dynamicds.datasource.CustomDataHolder;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -27,6 +26,7 @@ import org.springframework.context.annotation.Import;
 import javax.sql.DataSource;
 import java.sql.Connection;
 import java.util.*;
+import java.util.stream.Collectors;
 
 
 @Slf4j
@@ -74,14 +74,14 @@ public class DynamicDataSourceAutoConfiguration {
         String[] modelPacks = dynamicDataSourceProperties.getActable().getModelPacks();
         List<Class<?>> classes = TableClassUtil.loadTableClasses(modelPacks);
 
-        Map<String, List<Class<?>>> groupedMap = CollectionUtil.groupBy(clazz -> {
+        Map<String, List<Class<?>>> groupedMap = classes.stream().collect(Collectors.groupingBy(clazz -> {
             String ds = "";
             if (clazz.isAnnotationPresent(Table.class)) {
                 Table table = clazz.getAnnotation(Table.class);
                 ds = table.ds().trim();
             }
             return ds;
-        }, classes);
+        }));
 
         groupedMap.forEach((key, value) -> {
             Connection connection = null;

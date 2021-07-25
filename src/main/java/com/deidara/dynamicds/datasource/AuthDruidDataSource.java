@@ -2,13 +2,11 @@ package com.deidara.dynamicds.datasource;
 
 import com.alibaba.druid.pool.DruidDataSource;
 import com.alibaba.druid.pool.DruidPooledConnection;
+import com.deidara.hutool.AppUtil;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.io.IOUtils;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.security.UserGroupInformation;
 
-import java.io.File;
-import java.io.FileOutputStream;
 import java.security.PrivilegedExceptionAction;
 import java.sql.SQLException;
 
@@ -40,22 +38,7 @@ public class AuthDruidDataSource extends DruidDataSource {
     }
 
     public void setKeytabFile(String keytabFile) {
-        try {
-            if(keytabFile.startsWith("classpath:")){
-                String path = keytabFile.split("classpath:")[1].trim();
-                String fileName = path.substring(path.lastIndexOf("/") + 1);
-                String keytabPath = System.getProperty("user.home") + "/keytab/";
-                File file = new File(keytabPath);
-                if(!file.exists()){
-                    file.mkdirs();
-                }
-                keytabFile = keytabPath + fileName;
-                IOUtils.copy(AuthDruidDataSource.class.getClassLoader().getResourceAsStream(path), new FileOutputStream(keytabFile));
-            }
-            this.keytabFile = keytabFile;
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+        this.keytabFile = AppUtil.getConfFile(keytabFile);
     }
 
     public DruidPooledConnection superGetConnection(long maxWaitMillis) throws SQLException {
